@@ -1,0 +1,46 @@
+diff -aur squashfs-tools/squashfs-tools/Makefile squashfs-tools-patched/squashfs-tools/Makefile
+--- squashfs-tools/squashfs-tools/Makefile	2019-12-29 18:04:21.806647093 +0100
++++ squashfs-tools-patched/squashfs-tools/Makefile	2019-12-29 17:20:05.882203445 +0100
+@@ -30,7 +30,7 @@
+ # To build install the library and uncomment
+ # the XZ_SUPPORT line below.
+ #
+-#XZ_SUPPORT = 1
++XZ_SUPPORT = 1
+ 
+ 
+ ############ Building LZO support ##############
+diff -aur squashfs-tools/squashfs-tools/xz_wrapper.c squashfs-tools-patched/squashfs-tools/xz_wrapper.c
+--- squashfs-tools/squashfs-tools/xz_wrapper.c	2019-12-29 18:04:21.823313935 +0100
++++ squashfs-tools-patched/squashfs-tools/xz_wrapper.c	2019-12-29 17:37:31.544956136 +0100
+@@ -490,6 +490,30 @@
+ 	size_t src_pos = 0;
+ 	size_t dest_pos = 0;
+ 	uint64_t memlimit = MEMLIMIT;
++	
++        //
++	// tvt patch start
++        //
++
++        uint8_t *src_bytes = src;
++        src_bytes += 5;
++         
++        src_bytes[0] = 0xfd;
++        src_bytes[1] = 0x37;
++        src_bytes[2] = 0x7a;
++        src_bytes[3] = 0x58;
++        src_bytes[4] = 0x5a;
++        
++        size -= 10;
++        
++        src_bytes[size-2] = 0x59;
++        src_bytes[size-1] = 0x5a;
++        
++        src = src_bytes;
++        
++        //
++	// tvt patch end
++        //
+ 
+ 	lzma_ret res = lzma_stream_buffer_decode(&memlimit, 0, NULL,
+ 			src, &src_pos, size, dest, &dest_pos, outsize);
